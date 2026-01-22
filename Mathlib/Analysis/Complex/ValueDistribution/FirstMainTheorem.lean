@@ -46,7 +46,7 @@ difference between the characteristic functions of `f` and of its inverse.
 -/
 lemma characteristic_sub_characteristic_inv (h : Meromorphic f) :
     characteristic f ⊤ - characteristic f⁻¹ ⊤ =
-      circleAverage (log ‖f ·‖) 0 - (divisor f Set.univ).logCounting := by
+      circleAverage (log ‖f ·‖) 0 - (divisor f).logCounting := by
   calc characteristic f ⊤ - characteristic f⁻¹ ⊤
   _ = proximity f ⊤ - proximity f⁻¹ ⊤ - (logCounting f⁻¹ ⊤ - logCounting f ⊤) := by
     unfold characteristic
@@ -55,7 +55,7 @@ lemma characteristic_sub_characteristic_inv (h : Meromorphic f) :
     rw [proximity_sub_proximity_inv_eq_circleAverage h]
   _ = circleAverage (log ‖f ·‖) 0 - (logCounting f 0 - logCounting f ⊤) := by
     rw [logCounting_inv]
-  _ = circleAverage (log ‖f ·‖) 0 - (divisor f Set.univ).logCounting := by
+  _ = circleAverage (log ‖f ·‖) 0 - (divisor f).logCounting := by
     rw [← ValueDistribution.log_counting_zero_sub_logCounting_top]
 
 /--
@@ -67,12 +67,12 @@ lemma characteristic_sub_characteristic_inv_of_ne_zero
     characteristic f ⊤ R - characteristic f⁻¹ ⊤ R = log ‖meromorphicTrailingCoeffAt f 0‖ := by
   calc characteristic f ⊤ R - characteristic f⁻¹ ⊤ R
   _ = (characteristic f ⊤ - characteristic f⁻¹ ⊤) R := by simp
-  _ = circleAverage (log ‖f ·‖) 0 R - (divisor f Set.univ).logCounting R := by
+  _ = circleAverage (log ‖f ·‖) 0 R - (divisor f).logCounting R := by
     rw [characteristic_sub_characteristic_inv hf, Pi.sub_apply]
   _ = log ‖meromorphicTrailingCoeffAt f 0‖ := by
     rw [MeromorphicOn.circleAverage_log_norm hR hf.meromorphicOn]
     unfold Function.locallyFinsuppWithin.logCounting
-    have : (divisor f (closedBall 0 |R|)) = (divisor f Set.univ).toClosedBall R :=
+    have : (divisor f (closedBall 0 |R|)) = (divisor f).toClosedBall R :=
       (divisor_restrict hf.meromorphicOn (by tauto)).symm
     simp [this, toClosedBall, restrictMonoidHom, restrict_apply]
 
@@ -84,7 +84,7 @@ lemma characteristic_sub_characteristic_inv_at_zero (h : Meromorphic f) :
     characteristic f ⊤ 0 - characteristic f⁻¹ ⊤ 0 = log ‖f 0‖ := by
   calc characteristic f ⊤ 0 - characteristic f⁻¹ ⊤ 0
   _ = (characteristic f ⊤ - characteristic f⁻¹ ⊤) 0 := by simp
-  _ = circleAverage (log ‖f ·‖) 0 0 - (divisor f Set.univ).logCounting 0 := by
+  _ = circleAverage (log ‖f ·‖) 0 0 - (divisor f).logCounting 0 := by
     rw [ValueDistribution.characteristic_sub_characteristic_inv h, Pi.sub_apply]
   _ = log ‖f 0‖ := by
     simp

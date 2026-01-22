@@ -35,7 +35,7 @@ open Classical in
 The divisor of a meromorphic function `f`, mapping a point `z` to the order of `f` at `z`, and to
 zero if the order is infinite.
 -/
-noncomputable def divisor (f : 𝕜 → E) (U : Set 𝕜) :
+noncomputable def divisor (f : 𝕜 → E) (U := (Set.univ : Set 𝕜)) :
     Function.locallyFinsuppWithin U ℤ where
   toFun := fun z ↦ if MeromorphicOn f U ∧ z ∈ U then (meromorphicOrderAt f z).untop₀ else 0
   supportWithinDomain' z hz := by

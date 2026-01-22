@@ -68,7 +68,7 @@ lemma toClosedBall_eval_within {r : ℝ} {z : E} (f : locallyFinsuppWithin (univ
 
 @[simp]
 lemma toClosedBall_divisor {r : ℝ} {f : ℂ → ℂ} (h : Meromorphic f) :
-    (divisor f (closedBall 0 |r|)) = (locallyFinsuppWithin.toClosedBall r) (divisor f univ) := by
+    (divisor f (closedBall 0 |r|)) = (locallyFinsuppWithin.toClosedBall r) (divisor f) := by
   simp_all [locallyFinsuppWithin.toClosedBall]
 
 lemma toClosedBall_support_subset_closedBall {E : Type*} [NormedAddCommGroup E] {r : ℝ}
@@ -229,14 +229,14 @@ taking multiplicities into account.  In the special case where `a = ⊤`, it cou
 -/
 noncomputable def logCounting : ℝ → ℝ := by
   by_cases h : a = ⊤
-  · exact (divisor f univ)⁻.logCounting
-  · exact (divisor (fun z ↦ f z - a.untop₀) univ)⁺.logCounting
+  · exact (divisor f)⁻.logCounting
+  · exact (divisor (f · - a.untop₀))⁺.logCounting
 
 /--
 Relation between `ValueDistribution.logCounting` and `locallyFinsuppWithin.logCounting`.
 -/
 lemma _root_.locallyFinsuppWithin.logCounting_divisor {f : ℂ → ℂ} :
-    locallyFinsuppWithin.logCounting (divisor f ⊤) = logCounting f 0 - logCounting f ⊤ := by
+    (divisor f).logCounting = logCounting f 0 - logCounting f ⊤ := by
   simp [logCounting, ← locallyFinsuppWithin.logCounting.map_sub]
 
 /--
@@ -244,7 +244,7 @@ For finite values `a₀`, the logarithmic counting function `logCounting f a₀`
 counting function for the zeros of `f - a₀`.
 -/
 lemma logCounting_coe :
-    logCounting f a₀ = (divisor (fun z ↦ f z - a₀) univ)⁺.logCounting := by
+    logCounting f a₀ = (divisor (fun z ↦ f z - a₀))⁺.logCounting := by
   simp [logCounting]
 
 /--
@@ -260,7 +260,7 @@ The logarithmic counting function `logCounting f 0` is the logarithmic counting 
 with the zero-divisor of `f`.
 -/
 lemma logCounting_zero :
-    logCounting f 0 = (divisor f univ)⁺.logCounting := by
+    logCounting f 0 = (divisor f)⁺.logCounting := by
   simp [logCounting]
 
 /--
@@ -268,7 +268,7 @@ The logarithmic counting function `logCounting f ⊤` is the logarithmic countin
 with the pole-divisor of `f`.
 -/
 lemma logCounting_top :
-    logCounting f ⊤ = (divisor f univ)⁻.logCounting := by
+    logCounting f ⊤ = (divisor f)⁻.logCounting := by
   simp [logCounting]
 
 /--
@@ -283,8 +283,8 @@ The logarithmic counting function associated with the divisor of `f` is the diff
 `logCounting f 0` and `logCounting f ⊤`.
 -/
 theorem log_counting_zero_sub_logCounting_top {f : 𝕜 → E} :
-    (divisor f univ).logCounting = logCounting f 0 - logCounting f ⊤ := by
-  rw [← posPart_sub_negPart (divisor f univ), logCounting_zero, logCounting_top, map_sub]
+    (divisor f).logCounting = logCounting f 0 - logCounting f ⊤ := by
+  rw [← posPart_sub_negPart (divisor f), logCounting_zero, logCounting_top, map_sub]
 
 /--
 The logarithmic counting function of a constant function is zero.
@@ -308,7 +308,7 @@ theorem logCounting_even {f : 𝕜 → E} {e : WithTop E} :
   by_cases h : e = ⊤ <;> simp [logCounting, h, locallyFinsuppWithin.logCounting_even _ r]
 
 /--
-The logarithmic counting function is monotonous.
+The logarithmic counting function is monotone.
 -/
 theorem logCounting_monotoneOn {f : 𝕜 → E} {e : WithTop E} :
     MonotoneOn (logCounting f e) (Ioi 0) := by
@@ -322,9 +322,9 @@ theorem logCounting_nonneg {r : ℝ} {f : 𝕜 → E} {e : WithTop E} (hr : 1 �
     0 ≤ logCounting f e r := by
   by_cases h : e = ⊤
   · simp [logCounting, h, locallyFinsuppWithin.logCounting_nonneg
-      (negPart_nonneg (MeromorphicOn.divisor f univ)) hr]
+      (negPart_nonneg (divisor f)) hr]
   · simp [logCounting, h, locallyFinsuppWithin.logCounting_nonneg
-      (posPart_nonneg (MeromorphicOn.divisor (f · - e.untop₀) univ)) hr]
+      (posPart_nonneg (divisor (f · - e.untop₀))) hr]
 
 /--
 The logarithmic counting function is asymptotically non-negative.
@@ -530,11 +530,11 @@ This is a reformulation of Jensen's formula of complex analysis. See
 -/
 theorem Function.locallyFinsuppWithin.logCounting_divisor_eq_circleAverage_sub_const {R : ℝ}
     {f : ℂ → ℂ} (h : Meromorphic f) (hR : R ≠ 0) :
-    locallyFinsuppWithin.logCounting (divisor f ⊤) R =
+    (divisor f).logCounting R =
       circleAverage (log ‖f ·‖) 0 R - log ‖meromorphicTrailingCoeffAt f 0‖ := by
   have h₁f : MeromorphicOn f (closedBall 0 |R|) := by tauto
   simp only [MeromorphicOn.circleAverage_log_norm hR h₁f, locallyFinsuppWithin.logCounting,
-    top_eq_univ, AddMonoidHom.coe_mk, ZeroHom.coe_mk, zero_sub, norm_neg, add_sub_cancel_right]
+    AddMonoidHom.coe_mk, ZeroHom.coe_mk, zero_sub, norm_neg, add_sub_cancel_right]
   congr 1
   · simp_all
   · rw [divisor_apply, divisor_apply]

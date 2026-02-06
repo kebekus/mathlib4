@@ -58,7 +58,7 @@ continuous on a closed disc of radius `R` and center `c`, and is complex differe
 countably many points of its interior, then for every point `w` in the disk, the circle average
 `circleAverage (fun z ↦ ((z - c) * (z - w)⁻¹) • f z) c R` equals `f w`.
 -/
-theorem circleAverage_of_differentiable_on_off_countable₁ (hs : s.Countable)
+theorem circleAverage_sub_sub_inv_smul_of_differentiable_on_off_countable (hs : s.Countable)
     (h₁f : ContinuousOn f (closedBall c |R|)) (h₂f : ∀ z ∈ ball c |R| \ s, DifferentiableAt ℂ f z)
     (hw : w ∈ ball c |R|) (hR : R ≠ 0) :
     circleAverage (fun z ↦ ((z - c) / (z - w)) • f z) c R = f w := by
@@ -72,10 +72,10 @@ complex differentiable at all points of a closed disc of radius `R` and center `
 point `w` in the disk, the circle average `circleAverage (fun z ↦ ((z - c) * (z - w)⁻¹) • f z) c R`
 equals `f w`.
 -/
-theorem circleAverage_of_differentiable_on₁ (hf : ∀ z ∈ closedBall c |R|, DifferentiableAt ℂ f z)
-    (hw : w ∈ ball c |R|) (hR : R ≠ 0) :
+theorem circleAverage_sub_sub_inv_smul_of_differentiable_on
+    (hf : ∀ z ∈ closedBall c |R|, DifferentiableAt ℂ f z) (hw : w ∈ ball c |R|) (hR : R ≠ 0) :
     circleAverage (fun z ↦ ((z - c) / (z - w)) • f z) c R = f w :=
-  circleAverage_of_differentiable_on_off_countable₁ countable_empty
+  circleAverage_sub_sub_inv_smul_of_differentiable_on_off_countable countable_empty
     (fun x hx ↦ (hf x hx).continuousAt.continuousWithinAt)
     (fun z hz ↦ hf z (by simp_all [le_of_lt])) hw hR
 
@@ -97,7 +97,8 @@ theorem circleAverage_of_differentiable_on_off_countable (hs : s.Countable)
     circleAverage f c R = f c := by
   by_cases hR : R = 0
   · simp [hR]
-  · rw [← circleAverage_of_differentiable_on_off_countable₁ hs h₁f h₂f (by aesop) hR]
+  · rw [← circleAverage_sub_sub_inv_smul_of_differentiable_on_off_countable hs h₁f h₂f (by aesop)
+      hR]
     apply circleAverage_congr_sphere fun z hz ↦ ?_
     have : z - c ≠ 0 := by grind [ne_of_mem_sphere]
     simp_all
@@ -111,7 +112,7 @@ theorem circleAverage_of_differentiable_on (hf : ∀ z ∈ closedBall c |R|, Dif
     circleAverage f c R = f c := by
   by_cases hR : R = 0
   · simp [hR]
-  · rw [← circleAverage_of_differentiable_on₁ hf (by aesop) hR]
+  · rw [← circleAverage_sub_sub_inv_smul_of_differentiable_on hf (by aesop) hR]
     apply circleAverage_congr_sphere fun z hz ↦ ?_
     have : z - c ≠ 0 := by grind [ne_of_mem_sphere]
     simp_all

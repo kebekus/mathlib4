@@ -8,6 +8,7 @@ module
 public import Mathlib.Analysis.Analytic.IsolatedZeros
 public import Mathlib.Analysis.SpecialFunctions.Complex.CircleMap
 public import Mathlib.Analysis.SpecialFunctions.NonIntegrable
+public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Periodic
 
 /-!
 # Integral over a circle in `ℂ`
@@ -148,7 +149,7 @@ theorem continuous_circleMap_inv {R : ℝ} {z w : ℂ} (hw : w ∈ ball z R) :
   exact Continuous.inv₀ (by fun_prop) this
 
 theorem circleMap_preimage_codiscrete {c : ℂ} {R : ℝ} (hR : R ≠ 0) :
-    map (circleMap c R) (codiscrete ℝ) ≤ codiscreteWithin (Metric.sphere c |R|) := by
+    map (circleMap c R) (codiscrete ℝ) ≤ codiscreteWithin (sphere c |R|) := by
   intro s hs
   apply (analyticOnNhd_circleMap c R).preimage_mem_codiscreteWithin
   · intro x hx
@@ -248,9 +249,37 @@ end CircleIntegrable
 theorem circleIntegrable_zero_radius {f : ℂ → E} {c : ℂ} : CircleIntegrable f c 0 := by
   simp [CircleIntegrable]
 
+/--
+Circle integrability depends only on the restriction of the function to the spere.
+-/
+theorem CircleIntegrable.congr {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → E}
+    (hf : Set.EqOn f₁ f₂ (sphere c |R|)) :
+    CircleIntegrable f₁ c R ↔ CircleIntegrable f₂ c R :=
+  intervalIntegrable_congr (fun x _ ↦ hf (circleMap_mem_sphere' c R x))
+
+/--
+Circle integrability is invarian when taking negative radiusdepends only on the restriction of the
+function to the spere.
+-/
+theorem CircleIntegrable.congr_neg_radius {c : ℂ} {R : ℝ} {f : ℂ → E} :
+    CircleIntegrable f c R ↔ CircleIntegrable f c (-R) := by
+  unfold CircleIntegrable
+  rw [intervalIntegrable_congr (f := fun θ ↦ f (circleMap c (-R) θ))
+    (g := fun θ ↦ f (circleMap c R (θ + π))) (fun _ _ ↦ by simp [circleMap_neg_radius]),
+    ← IntervalIntegrable.comp_add_right_iff (c := π)]
+  have a₀ : (fun x ↦ f (circleMap c R (x + π))).Periodic (2 * π) := by
+    intro x
+    simp only [circleMap, ofReal_add, ofReal_mul, ofReal_ofNat]
+    congr 3
+    rw [exp_eq_exp_iff_exists_int]
+    use 1
+    ring
+  simpa [(by ring : (2 * π - π) = (-π + 2 * π))] using
+    a₀.intervalIntegrable_iff Real.two_pi_pos (t₁ := -π) (t₂ := 0)
+
 /-- Circle integrability is invariant when functions change along discrete sets. -/
 theorem CircleIntegrable.congr_codiscreteWithin {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → E}
-    (hf : f₁ =ᶠ[codiscreteWithin (Metric.sphere c |R|)] f₂) (hf₁ : CircleIntegrable f₁ c R) :
+    (hf : f₁ =ᶠ[codiscreteWithin (sphere c |R|)] f₂) (hf₁ : CircleIntegrable f₁ c R) :
     CircleIntegrable f₂ c R := by
   by_cases hR : R = 0
   · simp [hR]
@@ -262,7 +291,7 @@ theorem CircleIntegrable.congr_codiscreteWithin {c : ℂ} {R : ℝ} {f₁ f₂ :
 
 /-- Circle integrability is invariant when functions change along discrete sets. -/
 theorem circleIntegrable_congr_codiscreteWithin {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → E}
-    (hf : f₁ =ᶠ[codiscreteWithin (Metric.sphere c |R|)] f₂) :
+    (hf : f₁ =ᶠ[codiscreteWithin (sphere c |R|)] f₂) :
     CircleIntegrable f₁ c R ↔ CircleIntegrable f₂ c R :=
   ⟨(CircleIntegrable.congr_codiscreteWithin hf ·),
     (CircleIntegrable.congr_codiscreteWithin hf.symm ·)⟩
@@ -357,7 +386,7 @@ theorem integral_congr {f g : ℂ → E} {c : ℂ} {R : ℝ} (hR : 0 ≤ R) (h :
 
 /-- Circle integrals are invariant when functions change along discrete sets. -/
 theorem circleIntegral_congr_codiscreteWithin {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → ℂ}
-    (hf : f₁ =ᶠ[codiscreteWithin (Metric.sphere c |R|)] f₂) (hR : R ≠ 0) :
+    (hf : f₁ =ᶠ[codiscreteWithin (sphere c |R|)] f₂) (hR : R ≠ 0) :
     (∮ z in C(c, R), f₁ z) = (∮ z in C(c, R), f₂ z) := by
   apply intervalIntegral.integral_congr_ae_restrict
   apply ae_restrict_le_codiscreteWithin measurableSet_uIoc

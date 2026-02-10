@@ -306,6 +306,17 @@ theorem intervalIntegrable {t : ℝ} (h₁f : Function.Periodic f T)
   · simp [a, Nat.cast_add]
     ring
 
+/--
+Special case of Function.Periodic.intervalIntegrable: A periodic function is interval integrable
+over one full period if and only if it is interval integrable over any other full period.
+-/
+theorem intervalIntegrable_iff {t₁ t₂ : ℝ} (hf : Periodic f T) (hT : 0 < T)
+    (h₁ : ‖f (min t₁ (t₁ + T))‖ₑ ≠ ⊤ := by finiteness)
+    (h₂ : ‖f (min t₂ (t₂ + T))‖ₑ ≠ ⊤ := by finiteness) :
+    IntervalIntegrable f MeasureTheory.volume t₁ (t₁ + T)
+      ↔ IntervalIntegrable f MeasureTheory.volume t₂ (t₂ + T) :=
+  ⟨(hf.intervalIntegrable hT h₁ · t₂ (t₂ + T)), (hf.intervalIntegrable hT h₂ · t₁ (t₁ + T))⟩
+
 /-- Special case of Function.Periodic.intervalIntegrable: A periodic function is interval integrable
 over every interval if it is interval integrable over the period starting from zero. -/
 theorem intervalIntegrable₀ (h₁f : Function.Periodic f T) (hT : 0 < T)

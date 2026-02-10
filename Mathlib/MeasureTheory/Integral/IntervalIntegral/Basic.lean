@@ -432,15 +432,31 @@ theorem comp_add_right (hf : IntervalIntegrable f volume a b) (c : ℝ)
   convert (MeasurableEmbedding.integrableOn_map_iff A).mp hf using 1
   rw [preimage_add_const_uIcc]
 
+theorem comp_add_right_iff {c : ℝ} (h : ‖f (min a b)‖ₑ ≠ ⊤ := by finiteness) :
+    IntervalIntegrable (fun x ↦ f (x + c)) MeasureTheory.volume (a - c) (b - c)
+      ↔ IntervalIntegrable f MeasureTheory.volume a b :=
+  ⟨fun hf ↦ by simpa using hf.comp_add_right (-c) (by simp_all [min_add]),
+    (·.comp_add_right c)⟩
+
 theorem comp_add_left (hf : IntervalIntegrable f volume a b) (c : ℝ)
     (h : ‖f (min a b)‖ₑ ≠ ∞ := by finiteness) :
     IntervalIntegrable (fun x ↦ f (c + x)) volume (a - c) (b - c) := by
   simpa [add_comm] using IntervalIntegrable.comp_add_right hf c h
 
+theorem comp_add_left_iff {c : ℝ} (h : ‖f (min a b)‖ₑ ≠ ⊤ := by finiteness) :
+    IntervalIntegrable (fun x ↦ f (c + x)) MeasureTheory.volume (a - c) (b - c)
+      ↔ IntervalIntegrable f MeasureTheory.volume a b := by
+  simp_rw [add_comm c, IntervalIntegrable.comp_add_right_iff h]
+
 theorem comp_sub_right (hf : IntervalIntegrable f volume a b) (c : ℝ)
     (h : ‖f (min a b)‖ₑ ≠ ∞ := by finiteness) :
     IntervalIntegrable (fun x ↦ f (x - c)) volume (a + c) (b + c) := by
   simpa only [sub_neg_eq_add] using IntervalIntegrable.comp_add_right hf (-c) h
+
+theorem comp_sub_right_iff {c : ℝ} (h : ‖f (min a b)‖ₑ ≠ ⊤ := by finiteness) :
+    IntervalIntegrable (fun x ↦ f (x - c)) MeasureTheory.volume (a + c) (b + c)
+      ↔ IntervalIntegrable f MeasureTheory.volume a b := by
+  simp_rw [sub_eq_add_neg, ← IntervalIntegrable.comp_add_right_iff h (c := -c), sub_neg_eq_add]
 
 -- TODO: generalise this lemma to enorms!
 theorem iff_comp_neg {f : ℝ → E} (h : ‖f (min a b)‖ₑ ≠ ∞ := by finiteness) :

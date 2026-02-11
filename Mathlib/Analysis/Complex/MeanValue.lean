@@ -43,7 +43,7 @@ theorem circleAverage_sub_sub_inv_smul_of_differentiable_on_off_countable (hs : 
     (hw : w ∈ ball c |R|) :
     circleAverage (fun z ↦ ((z - c) / (z - w)) • f z) c R = f w := by
   rw [← circleAverage_abs_radius]
-  rcases le_or_gt (|R|) 0 with hR | hR
+  rcases le_or_gt |R| 0 with hR | hR
   · simp_all [(ball_eq_empty).2 hR]
   calc circleAverage (fun z ↦ ((z - c) * (z - w)⁻¹) • f z) c |R|
   _ = (2 * π * I)⁻¹ • (∮ z in C(c, |R|), (z - w)⁻¹ • f z) := by
@@ -66,8 +66,8 @@ complex differentiable at all points of a closed disc of radius `R` and center `
 point `w` in the disk, the circle average `circleAverage (fun z ↦ ((z - c) * (z - w)⁻¹) • f z) c R`
 equals `f w`.
 -/
-theorem circleAverage_sub_sub_inv_smul_of_differentiable_on
-    (hf : DiffContOnCl ℂ f (ball c |R|)) (hw : w ∈ ball c |R|) :
+theorem DiffContOnCl.circleAverage_smul_div (hf : DiffContOnCl ℂ f (ball c |R|))
+    (hw : w ∈ ball c |R|) :
     circleAverage (fun z ↦ ((z - c) / (z - w)) • f z) c R = f w := by
   by_cases hR : |R| ≤ 0
   · simp_all [(ball_eq_empty).2 hR]
@@ -76,6 +76,9 @@ theorem circleAverage_sub_sub_inv_smul_of_differentiable_on
   · intro z hz
     rw [diff_empty] at hz
     apply (hf.1 z hz).differentiableAt (isOpen_ball.mem_nhds hz)
+
+@[deprecated (since := "2026-02-11")]
+alias circleAverage_sub_sub_inv_smul_of_differentiable_on := DiffContOnCl.circleAverage_smul_div
 
 /-!
 ## Classic Mean Value Properties
@@ -105,11 +108,14 @@ The **Mean Value Property** of complex differentiable functions: If `f : ℂ →
 differentiable at all points of a closed disc of radius `R` and center `c`, then the circle average
 `circleAverage f c R` equals `f c`.
 -/
-theorem circleAverage_of_differentiable_on (hf : DiffContOnCl ℂ f (ball c |R|)) :
+theorem DiffContOnCl.circleAverage (hf : DiffContOnCl ℂ f (ball c |R|)) :
     circleAverage f c R = f c := by
   by_cases hR : R = 0
   · simp [hR]
-  · rw [← circleAverage_sub_sub_inv_smul_of_differentiable_on hf (by aesop)]
+  · rw [← circleAverage_smul_div hf (by aesop)]
     apply circleAverage_congr_sphere fun z hz ↦ ?_
     have : z - c ≠ 0 := by grind [ne_of_mem_sphere]
     simp_all
+
+@[deprecated (since := "2026-02-11")]
+alias circleAverage_of_differentiable_on := DiffContOnCl.circleAverage

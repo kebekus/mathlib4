@@ -36,7 +36,7 @@ theorem HarmonicOnNhd.circleAverage_eq (hf : HarmonicOnNhd f (closedBall c |R|))
   have h₄F : Set.EqOn (Complex.reCLM ∘ F) f (sphere c |R|) :=
     fun x hx ↦ h₂F (sphere_subset_ball (lt_add_of_pos_left |R| h₁e) hx)
   rw [← circleAverage_congr_sphere h₄F, Complex.reCLM.circleAverage_comp_comm,
-    circleAverage_of_differentiable_on h₃F.diffContOnCl]
+    h₃F.diffContOnCl.circleAverage]
   · apply h₂F
     simp [mem_ball, dist_self, add_pos_of_pos_of_nonneg h₁e (abs_nonneg R)]
   · apply (h₁F.continuousOn.mono (fun _ _ ↦ by simp_all [dist_eq_norm])).circleIntegrable'

@@ -43,9 +43,8 @@ theorem circleAverage_sub_sub_inv_smul_of_differentiable_on_off_countable (hs : 
     (hw : w ∈ ball c |R|) :
     circleAverage (fun z ↦ ((z - c) / (z - w)) • f z) c R = f w := by
   rw [← circleAverage_abs_radius]
-  by_cases hR : |R| ≤ 0
+  rcases le_or_gt (|R|) 0 with hR | hR
   · simp_all [(ball_eq_empty).2 hR]
-  rw [not_le] at hR
   calc circleAverage (fun z ↦ ((z - c) * (z - w)⁻¹) • f z) c |R|
   _ = (2 * π * I)⁻¹ • (∮ z in C(c, |R|), (z - w)⁻¹ • f z) := by
     simp only [circleAverage_eq_circleIntegral hR.ne', mul_inv_rev, inv_I, neg_mul, neg_smul,

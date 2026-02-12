@@ -258,11 +258,11 @@ theorem CircleIntegrable.congr {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → E}
   intervalIntegrable_congr (fun x _ ↦ hf (circleMap_mem_sphere' c R x))
 
 /--
-Circle integrability is invarian when taking negative radiusdepends only on the restriction of the
+Circle integrability is invariant when taking negative radiusdepends only on the restriction of the
 function to the spere.
 -/
-theorem CircleIntegrable.congr_neg_radius {c : ℂ} {R : ℝ} {f : ℂ → E} :
-    CircleIntegrable f c R ↔ CircleIntegrable f c (-R) := by
+@[simp] theorem circleIntegrable_neg_radius {c : ℂ} {R : ℝ} {f : ℂ → E} :
+    CircleIntegrable f c (-R) ↔ CircleIntegrable f c R := by
   unfold CircleIntegrable
   rw [intervalIntegrable_congr (f := fun θ ↦ f (circleMap c (-R) θ))
     (g := fun θ ↦ f (circleMap c R (θ + π))) (fun _ _ ↦ by simp [circleMap_neg_radius]),

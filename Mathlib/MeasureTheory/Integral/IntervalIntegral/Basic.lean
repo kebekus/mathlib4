@@ -433,8 +433,8 @@ theorem comp_add_right (hf : IntervalIntegrable f volume a b) (c : ℝ)
   rw [preimage_add_const_uIcc]
 
 theorem comp_add_right_iff {c : ℝ} (h : ‖f (min a b)‖ₑ ≠ ⊤ := by finiteness) :
-    IntervalIntegrable (fun x ↦ f (x + c)) MeasureTheory.volume (a - c) (b - c)
-      ↔ IntervalIntegrable f MeasureTheory.volume a b :=
+    IntervalIntegrable (fun x ↦ f (x + c)) volume a b
+      ↔ IntervalIntegrable f volume (a + c) (b + c) :=
   ⟨fun hf ↦ by simpa using hf.comp_add_right (-c) (by simp_all [min_add]),
     (·.comp_add_right c)⟩
 

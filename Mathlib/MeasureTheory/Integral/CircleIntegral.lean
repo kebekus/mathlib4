@@ -265,17 +265,9 @@ function to the spere.
     CircleIntegrable f c (-R) ↔ CircleIntegrable f c R := by
   unfold CircleIntegrable
   rw [intervalIntegrable_congr (f := fun θ ↦ f (circleMap c (-R) θ))
-    (g := fun θ ↦ f (circleMap c R (θ + π))) (fun _ _ ↦ by simp [circleMap_neg_radius]),
-    ← IntervalIntegrable.comp_add_right_iff (c := π)]
-  have a₀ : (fun x ↦ f (circleMap c R (x + π))).Periodic (2 * π) := by
-    intro x
-    simp only [circleMap, ofReal_add, ofReal_mul, ofReal_ofNat]
-    congr 3
-    rw [exp_eq_exp_iff_exists_int]
-    use 1
-    ring
-  simpa [(by ring : (2 * π - π) = (-π + 2 * π))] using
-    a₀.intervalIntegrable_iff Real.two_pi_pos (t₁ := -π) (t₂ := 0)
+    (g := fun θ ↦ (f ∘ (circleMap c R)) (θ + π)) (fun _ _ ↦ by simp [circleMap_neg_radius]),
+    IntervalIntegrable.comp_add_right_iff (c := π), add_comm (2 * π) π]
+  simpa using ((periodic_circleMap c R).comp f).intervalIntegrable_iff Real.two_pi_pos (t₂ := 0)
 
 /-- Circle integrability is invariant when functions change along discrete sets. -/
 theorem CircleIntegrable.congr_codiscreteWithin {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → E}

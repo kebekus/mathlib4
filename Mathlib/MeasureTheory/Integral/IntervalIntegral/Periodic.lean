@@ -315,7 +315,7 @@ theorem intervalIntegrable_iff {t₁ t₂ : ℝ} (hf : Periodic f T) (hT : 0 < T
     (h₂ : ‖f (min t₂ (t₂ + T))‖ₑ ≠ ⊤ := by finiteness) :
     IntervalIntegrable f MeasureTheory.volume t₁ (t₁ + T)
       ↔ IntervalIntegrable f MeasureTheory.volume t₂ (t₂ + T) :=
-  ⟨(hf.intervalIntegrable hT h₁ · t₂ (t₂ + T)), (hf.intervalIntegrable hT h₂ · t₁ (t₁ + T))⟩
+  ⟨(hf.intervalIntegrable hT (by grind) · t₂ (t₂ + T)), (hf.intervalIntegrable hT h₂ · t₁ (t₁ + T))⟩
 
 /-- Special case of Function.Periodic.intervalIntegrable: A periodic function is interval integrable
 over every interval if it is interval integrable over the period starting from zero. -/

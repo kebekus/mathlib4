@@ -306,14 +306,25 @@ theorem intervalIntegrable {t : ℝ} (h₁f : Function.Periodic f T)
   · simp [a, Nat.cast_add]
     ring
 
+-- Auxiliary lemma, showing `intervalIntegrable_iff` in case of positive period
+private lemma intervalIntegrable_iff_of_pos_period {t₁ t₂ : ℝ} (hf : Periodic f T) (hT : 0 < T)
+    (h₁ : ‖f t₁‖ₑ ≠ ⊤ := by finiteness) (h₂ : ‖f t₂‖ₑ ≠ ⊤ := by finiteness) :
+    IntervalIntegrable f volume t₁ (t₁ + T) ↔ IntervalIntegrable f volume t₂ (t₂ + T) :=
+  ⟨(hf.intervalIntegrable hT (by grind) · t₂ (t₂ + T)),
+    (hf.intervalIntegrable hT (by grind) · t₁ (t₁ + T))⟩
+
 /--
 Special case of Function.Periodic.intervalIntegrable: A periodic function is interval integrable
 over one full period if and only if it is interval integrable over any other full period.
 -/
-theorem intervalIntegrable_iff {t₁ t₂ : ℝ} (hf : Periodic f T) (hT : 0 < T)
-    (h₂ : ‖f t₂‖ₑ ≠ ⊤ := by finiteness) (h₂ : ‖f t₂‖ₑ ≠ ⊤ := by finiteness) :
-    IntervalIntegrable f volume t₁ (t₁ + T) ↔ IntervalIntegrable f volume t₂ (t₂ + T) :=
-  ⟨(hf.intervalIntegrable hT (by grind) · t₂ (t₂ + T)), (hf.intervalIntegrable hT h₂ · t₁ (t₁ + T))⟩
+theorem intervalIntegrable_iff {t₁ t₂ : ℝ} (hf : Periodic f T)
+    (h₁ : ‖f t₁‖ₑ ≠ ⊤ := by finiteness) (h₂ : ‖f t₂‖ₑ ≠ ⊤ := by finiteness) :
+    IntervalIntegrable f volume t₁ (t₁ + T) ↔ IntervalIntegrable f volume t₂ (t₂ + T) := by
+  rcases lt_trichotomy T 0 with h | h | h
+  · simpa [IntervalIntegrable.symm_iff] using
+      intervalIntegrable_iff_of_pos_period hf.neg (neg_pos.2 h) (t₁ := t₁ + T) (t₂ := t₂ + T)
+  · simp_all
+  · exact intervalIntegrable_iff_of_pos_period hf h
 
 /-- Special case of Function.Periodic.intervalIntegrable: A periodic function is interval integrable
 over every interval if it is interval integrable over the period starting from zero. -/

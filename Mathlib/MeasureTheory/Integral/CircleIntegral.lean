@@ -266,7 +266,7 @@ Circle integrability is invariant when taking negative radius.
   rw [intervalIntegrable_congr (f := fun θ ↦ f (circleMap c (-R) θ))
     (g := fun θ ↦ (f ∘ (circleMap c R)) (θ + π)) (fun _ _ ↦ by simp [circleMap_neg_radius]),
     IntervalIntegrable.comp_add_right_iff (c := π), add_comm (2 * π) π]
-  simpa using ((periodic_circleMap c R).comp f).intervalIntegrable_iff Real.two_pi_pos (t₂ := 0)
+  simpa using ((periodic_circleMap c R).comp f).intervalIntegrable_iff (t₂ := 0)
 
 /-- Circle integrability is invariant when functions change along discrete sets. -/
 theorem CircleIntegrable.congr_codiscreteWithin {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → E}

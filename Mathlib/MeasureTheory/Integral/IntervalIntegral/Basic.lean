@@ -446,8 +446,8 @@ theorem comp_add_left (hf : IntervalIntegrable f volume a b) (c : ℝ)
   simpa [add_comm] using IntervalIntegrable.comp_add_right hf c h
 
 theorem comp_add_left_iff {c : ℝ} (h : ‖f (min a b)‖ₑ ≠ ⊤ := by finiteness) :
-    IntervalIntegrable (fun x ↦ f (c + x)) MeasureTheory.volume (a - c) (b - c)
-      ↔ IntervalIntegrable f MeasureTheory.volume a b := by
+    IntervalIntegrable (fun x ↦ f (c + x)) volume (a - c) (b - c)
+      ↔ IntervalIntegrable f volume a b := by
   simp_rw [add_comm c]
   rw [IntervalIntegrable.comp_add_right_iff (by grind)]
   simp

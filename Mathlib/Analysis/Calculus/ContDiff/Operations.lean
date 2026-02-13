@@ -332,6 +332,65 @@ theorem ContDiffOn.sub {s : Set E} {f g : E → F} (hf : ContDiffOn 𝕜 n f s)
 theorem ContDiff.sub {f g : E → F} (hf : ContDiff 𝕜 n f) (hg : ContDiff 𝕜 n g) :
     ContDiff 𝕜 n fun x => f x - g x := by simpa only [sub_eq_add_neg] using hf.add hg.neg
 
+variable {i : ℕ}
+
+/--
+The iterated derivative of the difference of two functions is the difference of the iterated
+derivatives.
+-/
+theorem iteratedFDerivWithin_sub_apply {f g : E → F} (hf : ContDiffWithinAt 𝕜 i f s x)
+    (hg : ContDiffWithinAt 𝕜 i g s x) (hu : UniqueDiffOn 𝕜 s) (hx : x ∈ s) :
+    iteratedFDerivWithin 𝕜 i (f - g) s x =
+      iteratedFDerivWithin 𝕜 i f s x - iteratedFDerivWithin 𝕜 i g s x := by
+  rw [sub_eq_add_neg, iteratedFDerivWithin_add_apply hf _ hu hx,
+    iteratedFDerivWithin_neg_apply hu hx, sub_eq_add_neg]
+  exact hg.neg
+
+/--
+The iterated derivative of the difference of two functions is the difference of the iterated
+derivatives.
+-/
+theorem iteratedFDerivWithin_fun_sub_apply {f g : E → F} (hf : ContDiffWithinAt 𝕜 i f s x)
+    (hg : ContDiffWithinAt 𝕜 i g s x) (hu : UniqueDiffOn 𝕜 s) (hx : x ∈ s) :
+    iteratedFDerivWithin 𝕜 i (fun x ↦ f x - g x) s x =
+      iteratedFDerivWithin 𝕜 i f s x - iteratedFDerivWithin 𝕜 i g s x :=
+  iteratedFDerivWithin_sub_apply hf hg hu hx
+
+/--
+The iterated derivative of the difference of two functions is the difference of the iterated
+derivatives.
+-/
+theorem iteratedFDeriv_sub_apply {i : ℕ} {f g : E → F}
+    (hf : ContDiffAt 𝕜 i f x) (hg : ContDiffAt 𝕜 i g x) :
+    iteratedFDeriv 𝕜 i (f - g) x = iteratedFDeriv 𝕜 i f x - iteratedFDeriv 𝕜 i g x := by
+  simp_rw [← iteratedFDerivWithin_univ]
+  exact iteratedFDerivWithin_sub_apply hf hg uniqueDiffOn_univ (Set.mem_univ _)
+
+/--
+The iterated derivative of the difference of two functions is the difference of the iterated
+derivatives.
+-/
+theorem iteratedFDeriv_fun_sub_apply {i : ℕ} {f g : E → F} (hf : ContDiffAt 𝕜 i f x)
+    (hg : ContDiffAt 𝕜 i g x) :
+    iteratedFDeriv 𝕜 i (fun x => f x - g x) x = iteratedFDeriv 𝕜 i f x - iteratedFDeriv 𝕜 i g x :=
+  iteratedFDeriv_sub_apply hf hg
+
+/--
+The iterated derivative of the difference of two functions is the difference of the iterated
+derivatives.
+-/
+theorem iteratedFDeriv_sub {i : ℕ} {f g : E → F} (hf : ContDiff 𝕜 i f) (hg : ContDiff 𝕜 i g) :
+    iteratedFDeriv 𝕜 i (f - g) = iteratedFDeriv 𝕜 i f - iteratedFDeriv 𝕜 i g :=
+  funext fun _ ↦ iteratedFDeriv_sub_apply (ContDiff.contDiffAt hf) (ContDiff.contDiffAt hg)
+
+/--
+The iterated derivative of the difference of two functions is the difference of the iterated
+derivatives.
+-/
+theorem iteratedFDeriv_fun_sub {i : ℕ} {f g : E → F} (hf : ContDiff 𝕜 i f) (hg : ContDiff 𝕜 i g) :
+    iteratedFDeriv 𝕜 i (fun x ↦ f x - g x) = iteratedFDeriv 𝕜 i f - iteratedFDeriv 𝕜 i g :=
+  funext fun _ ↦ iteratedFDeriv_sub_apply (ContDiff.contDiffAt hf) (ContDiff.contDiffAt hg)
+
 /-! ### Sum of finitely many functions -/
 
 @[fun_prop]

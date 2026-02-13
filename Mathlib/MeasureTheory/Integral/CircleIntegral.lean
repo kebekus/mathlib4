@@ -250,16 +250,15 @@ theorem circleIntegrable_zero_radius {f : ℂ → E} {c : ℂ} : CircleIntegrabl
   simp [CircleIntegrable]
 
 /--
-Circle integrability depends only on the restriction of the function to the spere.
+Circle integrability depends only on the restriction of the function to the sphere.
 -/
-theorem CircleIntegrable.congr {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → E}
+theorem crcleIntegrable_congr {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → E}
     (hf : Set.EqOn f₁ f₂ (sphere c |R|)) :
     CircleIntegrable f₁ c R ↔ CircleIntegrable f₂ c R :=
   intervalIntegrable_congr (fun x _ ↦ hf (circleMap_mem_sphere' c R x))
 
 /--
-Circle integrability is invariant when taking negative radiusdepends only on the restriction of the
-function to the spere.
+Circle integrability is invariant when taking negative radius.
 -/
 @[simp] theorem circleIntegrable_neg_radius {c : ℂ} {R : ℝ} {f : ℂ → E} :
     CircleIntegrable f c (-R) ↔ CircleIntegrable f c R := by

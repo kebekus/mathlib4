@@ -255,7 +255,7 @@ Circle integrability depends only on the restriction of the function to the sphe
 theorem crcleIntegrable_congr {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → E}
     (hf : Set.EqOn f₁ f₂ (sphere c |R|)) :
     CircleIntegrable f₁ c R ↔ CircleIntegrable f₂ c R :=
-  intervalIntegrable_congr (fun x _ ↦ hf (circleMap_mem_sphere' c R x))
+  intervalIntegrable_congr fun x _ ↦ hf (circleMap_mem_sphere' c R x)
 
 /--
 Circle integrability is invariant when taking negative radius.

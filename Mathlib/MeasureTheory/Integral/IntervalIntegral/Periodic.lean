@@ -312,8 +312,7 @@ over one full period if and only if it is interval integrable over any other ful
 -/
 theorem intervalIntegrable_iff {t₁ t₂ : ℝ} (hf : Periodic f T) (hT : 0 < T)
     (h₂ : ‖f t₂‖ₑ ≠ ⊤ := by finiteness) (h₂ : ‖f t₂‖ₑ ≠ ⊤ := by finiteness) :
-    IntervalIntegrable f MeasureTheory.volume t₁ (t₁ + T)
-      ↔ IntervalIntegrable f MeasureTheory.volume t₂ (t₂ + T) :=
+    IntervalIntegrable f volume t₁ (t₁ + T) ↔ IntervalIntegrable f volume t₂ (t₂ + T) :=
   ⟨(hf.intervalIntegrable hT (by grind) · t₂ (t₂ + T)), (hf.intervalIntegrable hT h₂ · t₁ (t₁ + T))⟩
 
 /-- Special case of Function.Periodic.intervalIntegrable: A periodic function is interval integrable

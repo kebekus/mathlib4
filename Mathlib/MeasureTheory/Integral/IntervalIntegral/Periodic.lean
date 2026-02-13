@@ -275,12 +275,9 @@ variable {E : Type*} [NormedAddCommGroup E]
 
 variable {f : ℝ → E} {T : ℝ}
 
-/-- A periodic function is interval integrable over every interval if it is interval integrable
-over one period. -/
-theorem intervalIntegrable {t : ℝ} (h₁f : Function.Periodic f T)
-    (hT : 0 < T) (hT' : ‖f (min t (t + T))‖ₑ ≠ ∞ := by finiteness)
-    (h₂f : IntervalIntegrable f MeasureTheory.volume t (t + T)) (a₁ a₂ : ℝ) :
-    IntervalIntegrable f MeasureTheory.volume a₁ a₂ := by
+private lemma intervalIntegrable_aux {t : ℝ} (h₁f : Function.Periodic f T) (hT : 0 < T)
+    (h₂f : IntervalIntegrable f volume t (t + T)) (a₁ a₂ : ℝ) :
+    IntervalIntegrable f volume a₁ a₂ := by
   -- Replace [a₁, a₂] by [t - n₁ * T, t + n₂ * T], where n₁ and n₂ are natural numbers
   obtain ⟨n₁, hn₁⟩ := exists_nat_ge ((t - min a₁ a₂) / T)
   obtain ⟨n₂, hn₂⟩ := exists_nat_ge ((max a₁ a₂ - t) / T)
@@ -300,35 +297,44 @@ theorem intervalIntegrable {t : ℝ} (h₁f : Function.Periodic f T)
   apply IntervalIntegrable.trans_iterate
   -- Show integrability over a shifted period
   intro k hk
-  convert (IntervalIntegrable.comp_sub_right h₂f ((k - n₁) * T) hT') using 1
+  convert (IntervalIntegrable.comp_sub_right h₂f ((k - n₁) * T) (by aesop)) using 1
   · funext x
     simpa using (h₁f.sub_int_mul_eq (k - n₁)).symm
   · simp [a, Nat.cast_add]
     ring
 
+/-- A periodic function is interval integrable over every interval if it is interval integrable
+over one period. -/
+theorem intervalIntegrable {t : ℝ} (h₁f : Function.Periodic f T)
+    (hT : T ≠ 0) (h₂f : IntervalIntegrable f volume t (t + T)) (a₁ a₂ : ℝ) :
+    IntervalIntegrable f volume a₁ a₂ := by
+  rcases lt_trichotomy T 0 with h | h | h
+  · have hnT : 0 < -T := by aesop
+    nth_rw 1 [(by ring : t = (t + T) + (-T))] at h₂f
+    apply intervalIntegrable_aux h₁f.neg hnT h₂f.symm (t := t + T)
+  · tauto
+  · exact intervalIntegrable_aux h₁f h h₂f a₁ a₂
+
 -- Auxiliary lemma, showing `intervalIntegrable_iff` in case of positive period
-private lemma intervalIntegrable_iff_of_pos_period {t₁ t₂ : ℝ} (hf : Periodic f T) (hT : 0 < T)
-    (h₁ : ‖f t₁‖ₑ ≠ ⊤ := by finiteness) (h₂ : ‖f t₂‖ₑ ≠ ⊤ := by finiteness) :
+private lemma intervalIntegrable_iff_of_pos_period {t₁ t₂ : ℝ} (hf : Periodic f T) (hT : T ≠ 0) :
     IntervalIntegrable f volume t₁ (t₁ + T) ↔ IntervalIntegrable f volume t₂ (t₂ + T) :=
-  ⟨(hf.intervalIntegrable hT (by grind) · t₂ (t₂ + T)),
-    (hf.intervalIntegrable hT (by grind) · t₁ (t₁ + T))⟩
+  ⟨(hf.intervalIntegrable hT · t₂ (t₂ + T)), (hf.intervalIntegrable hT · t₁ (t₁ + T))⟩
 
 /--
 Special case of Function.Periodic.intervalIntegrable: A periodic function is interval integrable
 over one full period if and only if it is interval integrable over any other full period.
 -/
-theorem intervalIntegrable_iff {t₁ t₂ : ℝ} (hf : Periodic f T)
-    (h₁ : ‖f t₁‖ₑ ≠ ⊤ := by finiteness) (h₂ : ‖f t₂‖ₑ ≠ ⊤ := by finiteness) :
+theorem intervalIntegrable_iff {t₁ t₂ : ℝ} (hf : Periodic f T) :
     IntervalIntegrable f volume t₁ (t₁ + T) ↔ IntervalIntegrable f volume t₂ (t₂ + T) := by
   rcases lt_trichotomy T 0 with h | h | h
   · simpa [IntervalIntegrable.symm_iff] using
-      intervalIntegrable_iff_of_pos_period hf.neg (neg_pos.2 h) (t₁ := t₁ + T) (t₂ := t₂ + T)
+      intervalIntegrable_iff_of_pos_period hf.neg (by aesop) (t₁ := t₁ + T) (t₂ := t₂ + T)
   · simp_all
-  · exact intervalIntegrable_iff_of_pos_period hf h
+  · exact intervalIntegrable_iff_of_pos_period hf h.ne.symm
 
 /-- Special case of Function.Periodic.intervalIntegrable: A periodic function is interval integrable
 over every interval if it is interval integrable over the period starting from zero. -/
-theorem intervalIntegrable₀ (h₁f : Function.Periodic f T) (hT : 0 < T)
+theorem intervalIntegrable₀ (h₁f : Function.Periodic f T) (hT : T ≠ 0)
     (h₂f : IntervalIntegrable f MeasureTheory.volume 0 T) (a₁ a₂ : ℝ) :
     IntervalIntegrable f MeasureTheory.volume a₁ a₂ := by
   apply h₁f.intervalIntegrable hT (t := 0)
@@ -406,12 +412,12 @@ theorem sInf_add_zsmul_le_integral_of_pos (h_int : IntervalIntegrable g MeasureS
     (hT : 0 < T) (t : ℝ) :
     (sInf ((fun t => ∫ x in 0..t, g x) '' Icc 0 T) + ⌊t / T⌋ • ∫ x in 0..T, g x) ≤
       ∫ x in 0..t, g x := by
-  let h'_int := hg.intervalIntegrable₀ hT h_int
+  let h'_int := hg.intervalIntegrable₀ hT.ne.symm h_int
   let ε := Int.fract (t / T) * T
   conv_rhs =>
-    rw [← Int.fract_div_mul_self_add_zsmul_eq T t (by linarith),
+    rw [← Int.fract_div_mul_self_add_zsmul_eq T t hT.ne.symm,
       ← integral_add_adjacent_intervals (h'_int 0 ε) (h'_int _ _)]
-  rw [hg.intervalIntegral_add_zsmul_eq ⌊t / T⌋ ε (hg.intervalIntegrable₀ hT h_int),
+  rw [hg.intervalIntegral_add_zsmul_eq ⌊t / T⌋ ε (hg.intervalIntegrable₀ hT.ne.symm h_int),
     hg.intervalIntegral_add_eq ε 0, zero_add, add_le_add_iff_right]
   exact (continuous_primitive h'_int 0).continuousOn.sInf_image_Icc_le <|
     mem_Icc_of_Ico (Int.fract_div_mul_self_mem_Ico T t hT)
@@ -423,10 +429,10 @@ theorem integral_le_sSup_add_zsmul_of_pos (h_int : IntervalIntegrable g MeasureS
     (hT : 0 < T) (t : ℝ) :
     (∫ x in 0..t, g x) ≤
       sSup ((fun t => ∫ x in 0..t, g x) '' Icc 0 T) + ⌊t / T⌋ • ∫ x in 0..T, g x := by
-  let h'_int := hg.intervalIntegrable₀ hT h_int
+  let h'_int := hg.intervalIntegrable₀ hT.ne.symm h_int
   let ε := Int.fract (t / T) * T
   conv_lhs =>
-    rw [← Int.fract_div_mul_self_add_zsmul_eq T t (by linarith), ←
+    rw [← Int.fract_div_mul_self_add_zsmul_eq T t hT.ne.symm, ←
       integral_add_adjacent_intervals (h'_int 0 ε) (h'_int _ _)]
   rw [hg.intervalIntegral_add_zsmul_eq ⌊t / T⌋ ε h'_int, hg.intervalIntegral_add_eq ε 0, zero_add,
     add_le_add_iff_right]

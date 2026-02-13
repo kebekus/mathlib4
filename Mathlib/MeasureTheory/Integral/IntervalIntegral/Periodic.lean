@@ -321,8 +321,8 @@ private lemma intervalIntegrable_iff_of_pos_period {t₁ t₂ : ℝ} (hf : Perio
   ⟨(hf.intervalIntegrable hT · t₂ (t₂ + T)), (hf.intervalIntegrable hT · t₁ (t₁ + T))⟩
 
 /--
-A periodic function is interval integrable over one full period if and only if it is interval integrable
-over any other full period.
+A periodic function is interval integrable over one full period if and only if it is interval
+integrable over any other full period.
 
 Special case of `Function.Periodic.intervalIntegrable`.
 -/
@@ -332,8 +332,10 @@ theorem intervalIntegrable_iff {t₁ t₂ : ℝ} (hf : Periodic f T) :
   · simp_all
   · exact intervalIntegrable_iff_of_pos_period hf h
 
-/-- Special case of Function.Periodic.intervalIntegrable: A periodic function is interval integrable
-over every interval if it is interval integrable over the period starting from zero. -/
+/--
+Special case of `Function.Periodic.intervalIntegrable`: A periodic function is interval integrable
+over every interval if it is interval integrable over the period starting from zero.
+-/
 theorem intervalIntegrable₀ (h₁f : Function.Periodic f T) (hT : T ≠ 0)
     (h₂f : IntervalIntegrable f MeasureTheory.volume 0 T) (a₁ a₂ : ℝ) :
     IntervalIntegrable f MeasureTheory.volume a₁ a₂ := by

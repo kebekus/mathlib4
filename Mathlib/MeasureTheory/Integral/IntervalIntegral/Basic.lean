@@ -153,8 +153,8 @@ theorem MeasureTheory.Integrable.intervalIntegrable (hf : Integrable f μ) :
 omit [PseudoMetrizableSpace ε] in
 theorem MeasureTheory.IntegrableOn.intervalIntegrable (hf : IntegrableOn f [[a, b]] μ) :
     IntervalIntegrable f μ a b :=
-  ⟨MeasureTheory.IntegrableOn.mono_set hf (Ioc_subset_Icc_self.trans Icc_subset_uIcc),
-    MeasureTheory.IntegrableOn.mono_set hf (Ioc_subset_Icc_self.trans Icc_subset_uIcc')⟩
+  ⟨IntegrableOn.mono_set hf (Ioc_subset_Icc_self.trans Icc_subset_uIcc),
+    IntegrableOn.mono_set hf (Ioc_subset_Icc_self.trans Icc_subset_uIcc')⟩
 
 theorem intervalIntegrable_const_iff {c : ε} (hc : ‖c‖ₑ ≠ ⊤ := by finiteness) :
     IntervalIntegrable (fun _ => c) μ a b ↔ c = 0 ∨ μ (Ι a b) < ∞ := by
@@ -458,8 +458,8 @@ theorem comp_sub_right (hf : IntervalIntegrable f volume a b) (c : ℝ)
   simpa only [sub_neg_eq_add] using IntervalIntegrable.comp_add_right hf (-c) h
 
 theorem comp_sub_right_iff {c : ℝ} (h : ‖f (min a b)‖ₑ ≠ ⊤ := by finiteness) :
-    IntervalIntegrable (fun x ↦ f (x - c)) MeasureTheory.volume (a + c) (b + c)
-      ↔ IntervalIntegrable f MeasureTheory.volume a b := by
+    IntervalIntegrable (fun x ↦ f (x - c)) volume (a + c) (b + c)
+      ↔ IntervalIntegrable f volume a b := by
   simp_rw [sub_eq_add_neg]
   rw [IntervalIntegrable.comp_add_right_iff (by grind)]
   simp

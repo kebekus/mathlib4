@@ -434,7 +434,7 @@ theorem comp_add_right (hf : IntervalIntegrable f volume a b) (c : ℝ)
 
 theorem comp_add_right_iff {c : ℝ} (h : ‖f (min a b + c)‖ₑ ≠ ⊤ := by finiteness) :
     IntervalIntegrable (fun x ↦ f (x + c)) volume a b
-      ↔ IntervalIntegrable f volume (a + c) (b + c)
+      ↔ IntervalIntegrable f volume (a + c) (b + c) where
   mp hf := by simpa using hf.comp_add_right (-c)
   mpr hf := by
     have : ‖f (min (a + c) (b + c))‖ₑ ≠ ⊤ := by rwa [min_add_add_right]

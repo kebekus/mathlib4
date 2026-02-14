@@ -275,9 +275,20 @@ variable {E : Type*} [NormedAddCommGroup E]
 
 variable {f : ℝ → E} {T : ℝ}
 
-private lemma intervalIntegrable_aux {t : ℝ} (h₁f : Function.Periodic f T) (hT : 0 < T)
-    (h₂f : IntervalIntegrable f volume t (t + T)) (a₁ a₂ : ℝ) :
+/--
+A periodic function is interval integrable over every interval if it is interval integrable over one
+period.
+-/
+theorem intervalIntegrable {t : ℝ} (h₁f : Function.Periodic f T)
+    (hT : T ≠ 0) (h₂f : IntervalIntegrable f volume t (t + T)) (a₁ a₂ : ℝ) :
     IntervalIntegrable f volume a₁ a₂ := by
+  wlog hT : 0 < T
+  · rcases lt_trichotomy T 0 with h | h | h
+    · have hnT : 0 < -T := by aesop
+      nth_rw 1 [(by ring : t = (t + T) + (-T))] at h₂f
+      apply this h₁f.neg hnT.ne' h₂f.symm _ _ hnT
+    · tauto
+    · apply this h₁f h.ne' h₂f _ _ h
   -- Replace [a₁, a₂] by [t - n₁ * T, t + n₂ * T], where n₁ and n₂ are natural numbers
   obtain ⟨n₁, hn₁⟩ := exists_nat_ge ((t - min a₁ a₂) / T)
   obtain ⟨n₂, hn₂⟩ := exists_nat_ge ((max a₁ a₂ - t) / T)
@@ -302,18 +313,6 @@ private lemma intervalIntegrable_aux {t : ℝ} (h₁f : Function.Periodic f T) (
     simpa using (h₁f.sub_int_mul_eq (k - n₁)).symm
   · simp [a, Nat.cast_add]
     ring
-
-/-- A periodic function is interval integrable over every interval if it is interval integrable
-over one period. -/
-theorem intervalIntegrable {t : ℝ} (h₁f : Function.Periodic f T)
-    (hT : T ≠ 0) (h₂f : IntervalIntegrable f volume t (t + T)) (a₁ a₂ : ℝ) :
-    IntervalIntegrable f volume a₁ a₂ := by
-  rcases lt_trichotomy T 0 with h | h | h
-  · have hnT : 0 < -T := by aesop
-    nth_rw 1 [(by ring : t = (t + T) + (-T))] at h₂f
-    apply intervalIntegrable_aux h₁f.neg hnT h₂f.symm (t := t + T)
-  · tauto
-  · exact intervalIntegrable_aux h₁f h h₂f a₁ a₂
 
 -- Auxiliary lemma, showing `intervalIntegrable_iff` in case of positive period
 private lemma intervalIntegrable_iff_of_pos_period {t₁ t₂ : ℝ} (hf : Periodic f T) (hT : T ≠ 0) :

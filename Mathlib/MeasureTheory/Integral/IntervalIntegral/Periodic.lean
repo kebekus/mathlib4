@@ -283,12 +283,11 @@ theorem intervalIntegrable {t : ℝ} (h₁f : Function.Periodic f T)
     (hT : T ≠ 0) (h₂f : IntervalIntegrable f volume t (t + T)) (a₁ a₂ : ℝ) :
     IntervalIntegrable f volume a₁ a₂ := by
   wlog hT : 0 < T
-  · rcases lt_trichotomy T 0 with h | h | h
+  · rcases (not_lt.1 hT).eq_or_lt with h | h
+    · tauto
     · have hnT : 0 < -T := by aesop
       nth_rw 1 [(by ring : t = (t + T) + (-T))] at h₂f
       apply this h₁f.neg hnT.ne' h₂f.symm _ _ hnT
-    · tauto
-    · apply this h₁f h.ne' h₂f _ _ h
   -- Replace [a₁, a₂] by [t - n₁ * T, t + n₂ * T], where n₁ and n₂ are natural numbers
   obtain ⟨n₁, hn₁⟩ := exists_nat_ge ((t - min a₁ a₂) / T)
   obtain ⟨n₂, hn₂⟩ := exists_nat_ge ((max a₁ a₂ - t) / T)
@@ -314,11 +313,6 @@ theorem intervalIntegrable {t : ℝ} (h₁f : Function.Periodic f T)
   · simp [a, Nat.cast_add]
     ring
 
--- Auxiliary lemma, showing `intervalIntegrable_iff` in case of positive period
-private lemma intervalIntegrable_iff_of_pos_period {t₁ t₂ : ℝ} (hf : Periodic f T) (hT : T ≠ 0) :
-    IntervalIntegrable f volume t₁ (t₁ + T) ↔ IntervalIntegrable f volume t₂ (t₂ + T) :=
-  ⟨(hf.intervalIntegrable hT · t₂ (t₂ + T)), (hf.intervalIntegrable hT · t₁ (t₁ + T))⟩
-
 /--
 A periodic function is interval integrable over one full period if and only if it is interval
 integrable over any other full period.
@@ -327,9 +321,9 @@ Special case of `Function.Periodic.intervalIntegrable`.
 -/
 theorem intervalIntegrable_iff {t₁ t₂ : ℝ} (hf : Periodic f T) :
     IntervalIntegrable f volume t₁ (t₁ + T) ↔ IntervalIntegrable f volume t₂ (t₂ + T) := by
-  obtain rfl | h := eq_or_ne T 0
+  wlog hT : T ≠ 0
   · simp_all
-  · exact intervalIntegrable_iff_of_pos_period hf h
+  exact ⟨(hf.intervalIntegrable hT · t₂ (t₂ + T)), (hf.intervalIntegrable hT · t₁ (t₁ + T))⟩
 
 /--
 Special case of `Function.Periodic.intervalIntegrable`: A periodic function is interval integrable
@@ -347,25 +341,21 @@ theorem intervalIntegrable₀ (h₁f : Function.Periodic f T) (hT : T ≠ 0)
 
 variable [NormedSpace ℝ E]
 
-/-- An auxiliary lemma for a more general `Function.Periodic.intervalIntegral_add_eq`. -/
-theorem intervalIntegral_add_eq_of_pos (hf : Periodic f T) (hT : 0 < T) (t s : ℝ) :
+/-- If `f` is a periodic function with period `T`, then its integral over `[t, t + T]` does not
+depend on `t`. -/
+theorem intervalIntegral_add_eq (hf : Periodic f T) (t s : ℝ) :
     ∫ x in t..t + T, f x = ∫ x in s..s + T, f x := by
+  wlog hT : 0 < T
+  · rcases (not_lt.1 hT).eq_or_lt with hT | hT
+    · aesop
+    · rw [← neg_inj, ← integral_symm, ← integral_symm]
+      simpa only [← sub_eq_add_neg, add_sub_cancel_right] using
+        this hf.neg (t + T) (s + T) (by aesop : 0 < -T)
   simp only [integral_of_le, hT.le, le_add_iff_nonneg_right]
   haveI : VAddInvariantMeasure (AddSubgroup.zmultiples T) ℝ volume :=
     ⟨fun c s _ => measure_preimage_add _ _ _⟩
   apply IsAddFundamentalDomain.setIntegral_eq (G := AddSubgroup.zmultiples T)
   exacts [isAddFundamentalDomain_Ioc hT t, isAddFundamentalDomain_Ioc hT s, hf.map_vadd_zmultiples]
-
-/-- If `f` is a periodic function with period `T`, then its integral over `[t, t + T]` does not
-depend on `t`. -/
-theorem intervalIntegral_add_eq (hf : Periodic f T) (t s : ℝ) :
-    ∫ x in t..t + T, f x = ∫ x in s..s + T, f x := by
-  rcases lt_trichotomy (0 : ℝ) T with (hT | rfl | hT)
-  · exact hf.intervalIntegral_add_eq_of_pos hT t s
-  · simp
-  · rw [← neg_inj, ← integral_symm, ← integral_symm]
-    simpa only [← sub_eq_add_neg, add_sub_cancel_right] using
-      hf.neg.intervalIntegral_add_eq_of_pos (neg_pos.2 hT) (t + T) (s + T)
 
 /-- If `f` is an integrable periodic function with period `T`, then its integral over `[t, s + T]`
 is the sum of its integrals over the intervals `[t, s]` and `[t, t + T]`. -/

@@ -414,12 +414,12 @@ theorem sInf_add_zsmul_le_integral_of_pos (h_int : IntervalIntegrable g MeasureS
     (hT : 0 < T) (t : ℝ) :
     (sInf ((fun t => ∫ x in 0..t, g x) '' Icc 0 T) + ⌊t / T⌋ • ∫ x in 0..T, g x) ≤
       ∫ x in 0..t, g x := by
-  let h'_int := hg.intervalIntegrable₀ hT.ne.symm h_int
+  let h'_int := hg.intervalIntegrable₀ hT.ne' h_int
   let ε := Int.fract (t / T) * T
   conv_rhs =>
-    rw [← Int.fract_div_mul_self_add_zsmul_eq T t hT.ne.symm,
+    rw [← Int.fract_div_mul_self_add_zsmul_eq T t hT.ne',
       ← integral_add_adjacent_intervals (h'_int 0 ε) (h'_int _ _)]
-  rw [hg.intervalIntegral_add_zsmul_eq ⌊t / T⌋ ε (hg.intervalIntegrable₀ hT.ne.symm h_int),
+  rw [hg.intervalIntegral_add_zsmul_eq ⌊t / T⌋ ε (hg.intervalIntegrable₀ hT.ne' h_int),
     hg.intervalIntegral_add_eq ε 0, zero_add, add_le_add_iff_right]
   exact (continuous_primitive h'_int 0).continuousOn.sInf_image_Icc_le <|
     mem_Icc_of_Ico (Int.fract_div_mul_self_mem_Ico T t hT)
@@ -431,10 +431,10 @@ theorem integral_le_sSup_add_zsmul_of_pos (h_int : IntervalIntegrable g MeasureS
     (hT : 0 < T) (t : ℝ) :
     (∫ x in 0..t, g x) ≤
       sSup ((fun t => ∫ x in 0..t, g x) '' Icc 0 T) + ⌊t / T⌋ • ∫ x in 0..T, g x := by
-  let h'_int := hg.intervalIntegrable₀ hT.ne.symm h_int
+  let h'_int := hg.intervalIntegrable₀ hT.ne' h_int
   let ε := Int.fract (t / T) * T
   conv_lhs =>
-    rw [← Int.fract_div_mul_self_add_zsmul_eq T t hT.ne.symm, ←
+    rw [← Int.fract_div_mul_self_add_zsmul_eq T t hT.ne', ←
       integral_add_adjacent_intervals (h'_int 0 ε) (h'_int _ _)]
   rw [hg.intervalIntegral_add_zsmul_eq ⌊t / T⌋ ε h'_int, hg.intervalIntegral_add_eq ε 0, zero_add,
     add_le_add_iff_right]

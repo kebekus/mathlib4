@@ -130,14 +130,15 @@ The logarithmic counting function of a singleton indicator is asymptotically equ
 -/
 @[simp] lemma logCounting_single_eq_log_sub_const [ProperSpace E] {e : E} {r : ℝ} (hr : ‖e‖ ≤ r) :
     logCounting (single e) r = log r - log ‖e‖ := by
+  classical
   simp only [logCounting, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
   rw [finsum_eq_sum_of_support_subset _ (s := (finite_singleton e).toFinset)
-    (by simp_all [toClosedBall, restrict_apply, single_eval])]
+    (by simp_all [toClosedBall, restrict_apply, single_apply])]
   simp only [toFinite_toFinset, toFinset_singleton, Finset.sum_singleton]
   rw [toClosedBall_eval_within _ (by simpa [abs_of_nonneg ((norm_nonneg e).trans hr)])]
   by_cases he : 0 = e
-  · simp [← he, single_eval]
-  · simp only [single_eval, he, reduceIte, Int.cast_zero, zero_mul, add_zero,
+  · simp [← he, single_apply]
+  · simp only [single_apply, he, reduceIte, Int.cast_zero, zero_mul, add_zero,
       log_mul (ne_of_lt (lt_of_lt_of_le (norm_pos_iff.mpr (he ·.symm)) hr)).symm
       (inv_ne_zero (norm_ne_zero_iff.mpr (he ·.symm))), log_inv]
     grind

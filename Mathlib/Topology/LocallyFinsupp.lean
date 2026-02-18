@@ -58,6 +58,18 @@ A function with locally finite support is a function with locally finite support
 abbrev Function.locallyFinsupp [Zero Y] := locallyFinsuppWithin (Set.univ : Set X) Y
 
 /--
+Function with locally finite support have a zero.
+-/
+instance [Zero Y] : Zero (locallyFinsuppWithin U Y) where
+  zero := {
+    toFun := fun _ ↦ 0
+    supportWithinDomain' := by simp
+    supportLocallyFiniteWithinDomain' z hz := by
+      simp_rw [support_fun_zero, inter_empty, finite_empty, and_true]
+      use Set.univ, univ_mem
+  }
+
+/--
 For T1 spaces, the condition `supportLocallyFiniteWithinDomain'` is equivalent to saying that the
 support is codiscrete within `U`.
 -/
@@ -104,20 +116,27 @@ lemma coe_injective [Zero Y] :
 Is analogy to `Finsupp.single`, this definition presents the indicator function
 of a single point as a function with locally finite support.
 -/
-noncomputable def single (x : X) : locallyFinsupp X ℤ where
-  toFun :=
-    haveI := Classical.decEq X
-    Pi.single x 1
+noncomputable def single [DecidableEq X] [Zero Y] (x : X) (y : Y) : locallyFinsupp X Y where
+  toFun :=  Pi.single x y
   supportWithinDomain' z hz := by tauto
-  supportLocallyFiniteWithinDomain' _ _ := ⟨Set.univ, univ_mem, by simp [Pi.support_single_of_ne]⟩
+  supportLocallyFiniteWithinDomain' _ _:=
+    ⟨Set.univ, univ_mem, by simpa using (finite_singleton x).subset Pi.support_single_subset⟩
 
 /--
-Simplifier lemma: `single e` takes the value `1` at `e` and is zero otherwise.
+Simplifier lemma: `single x y` takes the value `y` at `x` and is zero otherwise.
 -/
-@[simp, grind =] lemma single_apply {x₁ x₂ : X} [Decidable (x₂ = x₁)] :
-    single x₁ x₂ = if x₂ = x₁ then 1 else 0 := by
+@[simp] lemma single_apply [DecidableEq X] [Zero Y] {x₁ x₂ : X} {y : Y} :
+    single x₁ y x₂ = if x₂ = x₁ then y else 0 := by
   classical
-  simp_rw [DFunLike.coe, single, Pi.single_apply, ite_eq_ite]
+  simp_rw [DFunLike.coe, single, Pi.single_apply]
+
+/--
+Simplifier lemma: coercion of `singly x y` to a function.
+-/
+@[simp] lemma coe_single [DecidableEq X] [Zero Y] {x : X} {y : Y} :
+    (single x y : X → Y) = Pi.single x y := by
+  ext
+  simp [Pi.single_apply]
 
 /-!
 ## Elementary properties of the support
@@ -276,11 +295,33 @@ instance [LE Y] [Zero Y] : LE (locallyFinsuppWithin U Y) where
 lemma le_def [LE Y] [Zero Y] {D₁ D₂ : locallyFinsuppWithin U Y} :
     D₁ ≤ D₂ ↔ (D₁ : X → Y) ≤ (D₂ : X → Y) := ⟨(·),(·)⟩
 
+lemma single_nonneg [DecidableEq X] [Zero Y] [Preorder Y] {x : X} {y : Y} :
+    0 ≤ single x y ↔ 0 ≤ y := by
+  simp only [le_def, coe_single]
+  apply Pi.single_nonneg
+
+@[simp] lemma single_nonneg_nat_one [DecidableEq X] [Zero Y] [Preorder Y] {x : X} :
+    0 ≤ single x 1 := single_nonneg.2 (Nat.zero_le 1)
+
+@[simp] lemma single_nonneg_int_one [DecidableEq X] [Zero Y] [Preorder Y] {x : X} :
+    0 ≤ single x (1 : ℤ) := single_nonneg.2 Int.one_nonneg
+
 instance [Preorder Y] [Zero Y] : LT (locallyFinsuppWithin U Y) where
   lt := fun D₁ D₂ ↦ (D₁ : X → Y) < D₂
 
 lemma lt_def [Preorder Y] [Zero Y] {D₁ D₂ : locallyFinsuppWithin U Y} :
     D₁ < D₂ ↔ (D₁ : X → Y) < (D₂ : X → Y) := ⟨(·),(·)⟩
+
+lemma single_pos [DecidableEq X] [Zero Y] [Preorder Y] {x : X} {y : Y} :
+    0 < single x y ↔ 0 < y := by
+  simp only [lt_def, coe_single, Pi.single]
+  exact lt_update_self_iff
+
+@[simp] lemma single_pos_nat_one [DecidableEq X] [Zero Y] [Preorder Y] {x : X} :
+    0 < single x 1 := single_pos.2 Nat.one_pos
+
+@[simp] lemma single_pos_int_one [DecidableEq X] [Zero Y] [Preorder Y] {x : X} :
+    0 < single x (1 : ℤ) := single_pos.2 Int.one_pos
 
 instance [SemilatticeSup Y] [Zero Y] : Max (locallyFinsuppWithin U Y) where
   max D₁ D₂ :=
@@ -417,25 +458,10 @@ theorem nsmul_negPart (n : ℕ) (f : locallyFinsuppWithin U Y) : (n • f)⁻ = 
   · simpa [not_lt.1 h] using nsmul_nonneg (not_lt.1 h) n
 
 /--
-The function `single e` is positive.
--/
-@[simp] lemma single_pos {x : X} : 0 < single x := by
-  classical
-  apply lt_of_le_of_ne
-  · intro y
-    by_cases he : y = x
-    all_goals
-      simp_all [single_apply]
-  · apply DFunLike.ne_iff.2
-    use x
-    simp [single_apply]
-
-/--
 Every positive function with locally finite supports dominates a singleton indicator.
 -/
-lemma exists_single_le_pos {D : locallyFinsuppWithin (Set.univ : Set X) ℤ} (h : 0 < D) :
-    ∃ e, single e ≤ D := by
-  classical
+lemma exists_single_le_pos [DecidableEq X] {D : locallyFinsupp X ℤ} (h : 0 < D) :
+    ∃ e, single e 1 ≤ D := by
   obtain ⟨z, hz⟩ := (by simpa [D.ext_iff] using (ne_of_lt h).symm : ∃ z, D z ≠ 0)
   use z
   intro e

@@ -128,8 +128,9 @@ Evaluation of the logarithmic counting function at zero yields zero.
 The logarithmic counting function of a singleton indicator is asymptotically equal to
 `log · - log ‖e‖`.
 -/
-@[simp] lemma logCounting_single_eq_log_sub_const [ProperSpace E] {e : E} {r : ℝ} (hr : ‖e‖ ≤ r) :
-    logCounting (single e) r = log r - log ‖e‖ := by
+@[simp] lemma logCounting_single_eq_log_sub_const [DecidableEq E] [ProperSpace E] {e : E} {r : ℝ}
+    (hr : ‖e‖ ≤ r) :
+    logCounting (single e 1) r = log r - log ‖e‖ := by
   classical
   simp only [logCounting, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
   rw [finsum_eq_sum_of_support_subset _ (s := (finite_singleton e).toFinset)
@@ -195,10 +196,10 @@ lemma logCounting_mono [ProperSpace E] {D : locallyFinsupp E ℤ} (hD : 0 ≤ D)
 The logarithmic counting function of a positive function with locally finite support is
 asymptotically strictly monotone.
 -/
-lemma logCounting_strictMono [ProperSpace E] {D : locallyFinsuppWithin (univ : Set E) ℤ} {e : E}
-    (hD : single e ≤ D) :
+lemma logCounting_strictMono [DecidableEq E] [ProperSpace E] {D : locallyFinsupp E ℤ} {e : E}
+    (hD : single e 1 ≤ D) :
     StrictMonoOn (logCounting D) (Ioi ‖e‖) := by
-  rw [(by aesop : logCounting D = logCounting (single e) + logCounting (D - single e))]
+  rw [(by aesop : logCounting D = logCounting (single e 1) + logCounting (D - single e 1))]
   apply StrictMonoOn.add_monotone
   · intro a ha b hb hab
     rw [mem_Ioi] at ha hb

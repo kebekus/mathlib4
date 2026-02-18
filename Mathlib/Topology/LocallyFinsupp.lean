@@ -109,12 +109,7 @@ noncomputable def single (x : X) : locallyFinsupp X ℤ where
     haveI := Classical.decEq X
     Pi.single x 1
   supportWithinDomain' z hz := by tauto
-  supportLocallyFiniteWithinDomain' := by
-    intro _ _
-    use ⊤
-    simp only [top_eq_univ, univ_mem, univ_inter, true_and]
-    convert (finite_singleton x)
-    aesop
+  supportLocallyFiniteWithinDomain' _ _ := ⟨Set.univ, univ_mem, by simp [Pi.support_single_of_ne]⟩
 
 /--
 Simplifier lemma: `single e` takes the value `1` at `e` and is zero otherwise.

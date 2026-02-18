@@ -33,10 +33,8 @@ lemma re_herglotz_riesz_eq_poisson {a b : ℂ} :
   calc ((a.re + b.re) * (a.re - b.re) + (a.im + b.im) * (a.im - b.im)) / ‖a - b‖ ^ 2
     _ = ((a.re * a.re + a.im * a.im) - (b.re * b.re + b.im * b.im)) / ‖a - b‖ ^ 2 := by
       congr! 1; ring
-    _ = ((normSq a) - (normSq b)) / ‖a - b‖ ^ 2 := by
-      simp only [normSq_apply]
     _ = (‖a‖ ^ 2 - ‖b‖ ^ 2) / ‖a - b‖ ^ 2 := by
-      simp only [normSq_eq_norm_sq]
+      simp [← normSq_apply, normSq_eq_norm_sq]
 
 private lemma re_herglotz_riesz_le_aux {φ θ : ℝ} {r R : ℝ} (h₁ : 0 < r) (h₂ : r < R) :
     ((R * exp (θ * I) + r * exp (φ * I)) / (R * exp (θ * I) - r * exp (φ * I))).re

@@ -29,10 +29,8 @@ the Poisson kernel agree on the path of integration.
 -/
 lemma re_herglotz_riesz_eq_poisson {a b : ℂ} :
     ((a + b) / (a - b)).re = (‖a‖ ^ 2 - ‖b‖ ^ 2) / ‖a - b‖ ^ 2 := by
-  rw [div_re, normSq_eq_norm_sq (a - b)]
-  calc (a + b).re * (a - b).re / ‖a - b‖ ^ 2 + (a + b).im * (a - b).im / ‖a - b‖ ^ 2
-    _ = ((a.re + b.re) * (a.re - b.re) + (a.im + b.im) * (a.im - b.im)) / ‖a - b‖ ^ 2 := by
-      simp only [add_re, sub_re, add_im, sub_im, add_div]
+  rw [div_re, normSq_eq_norm_sq (a - b), ← add_div, add_re, sub_re, add_im, sub_im]
+  calc ((a.re + b.re) * (a.re - b.re) + (a.im + b.im) * (a.im - b.im)) / ‖a - b‖ ^ 2
     _ = ((a.re * a.re + a.im * a.im) - (b.re * b.re + b.im * b.im)) / ‖a - b‖ ^ 2 := by
       ring_nf
     _ = ((normSq a) - (normSq b)) / ‖a - b‖ ^ 2 := by

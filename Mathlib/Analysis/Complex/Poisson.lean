@@ -110,27 +110,21 @@ lemma circleAverage_re_smul_on_ball_zero_aux {φ θ : ℝ} {r : ℝ} (h₁ : 0 <
     (R * exp (θ * I)) / (R * exp (θ * I)  - r * exp (φ * I)) - (r * exp (θ * I))
       / (r * exp (θ * I) - R * exp (φ * I))
       = ((R * exp (θ * I) + r * exp (φ * I)) / (R * exp (θ * I) - r * exp (φ * I))).re := by
-  by_cases h₃ : (R * exp ( θ * I ) - r * exp (φ * Complex.I)) = 0
-  · simp_all only [sub_eq_iff_eq_add, zero_add, Complex.ext_iff, mul_re, ofReal_re,
-      exp_ofReal_mul_I_re, ofReal_im, exp_ofReal_mul_I_im, zero_mul, sub_zero, mul_im, add_zero,
-      div_eq_mul_inv, add_re, inv_re, sub_re, sub_self, mul_zero, add_im, inv_im, sub_im, neg_zero,
-      ofReal_zero, neg_sub]
-    have := congr_arg ( · ^ 2 ) h₃.1
-    have := congr_arg ( · ^ 2 ) h₃.2
-    ring_nf at *
-    nlinarith [Real.sin_sq_add_cos_sq θ, Real.sin_sq_add_cos_sq φ]
-  · simp_all only [Complex.ext_iff, sub_re, mul_re, ofReal_re, exp_ofReal_mul_I_re, ofReal_im,
-      exp_ofReal_mul_I_im, zero_mul, sub_zero, zero_re, sub_im, mul_im, add_zero, zero_im, not_and,
-      div_eq_mul_inv, add_re, inv_re, add_im, inv_im, neg_sub, ofReal_sub, ofReal_mul, ofReal_add,
-      ofReal_cos, ofReal_inv, ofReal_sin, cos_ofReal_im, mul_zero, normSq_ofReal, mul_inv_rev,
-      isUnit_iff_ne_zero, ne_eq, map_eq_zero, not_false_eq_true, implies_true,
-      IsUnit.mul_inv_cancel_left, sub_self, neg_zero, sin_ofReal_im]
-    norm_num [normSq, exp_re, exp_im]
-    ring_nf
-    norm_cast
-    norm_num [Real.sin_sq, Real.cos_sq]
-    ring_nf
-    tauto
+  have h₃ : (R * exp ( θ * I ) - r * exp (φ * Complex.I)) ≠ 0 := by
+    simpa [sub_eq_zero] using
+      (mt <| congr_arg (‖·‖)) <| by simpa [abs_of_pos, h₁, h₁.trans h₂] using h₂.ne'
+  simp_all only [Complex.ext_iff, sub_re, mul_re, ofReal_re, exp_ofReal_mul_I_re, ofReal_im,
+    exp_ofReal_mul_I_im, zero_mul, sub_zero, zero_re, sub_im, mul_im, add_zero, zero_im, not_and,
+    div_eq_mul_inv, add_re, inv_re, add_im, inv_im, neg_sub, ofReal_sub, ofReal_mul, ofReal_add,
+    ofReal_cos, ofReal_inv, ofReal_sin, cos_ofReal_im, mul_zero, normSq_ofReal, mul_inv_rev,
+    isUnit_iff_ne_zero, ne_eq, map_eq_zero, not_false_eq_true, implies_true,
+    IsUnit.mul_inv_cancel_left, sub_self, neg_zero, sin_ofReal_im]
+  norm_num [normSq, exp_re, exp_im]
+  ring_nf
+  norm_cast
+  norm_num [Real.sin_sq, Real.cos_sq]
+  ring_nf
+  tauto
 
 -- Version of `DiffContOnCl.circleAverage_re_smul` in case where the center of the ball is zero.
 private lemma DiffContOnCl.circleAverage_re_smul_on_ball_zero [CompleteSpace E]

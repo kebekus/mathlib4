@@ -39,12 +39,11 @@ lemma re_herglotz_riesz_eq_poisson {a b : ℂ} :
 private lemma re_herglotz_riesz_le_aux {φ θ : ℝ} {r R : ℝ} (h₁ : 0 < r) (h₂ : r < R) :
     ((R * exp (θ * I) + r * exp (φ * I)) / (R * exp (θ * I) - r * exp (φ * I))).re
       ≤ (R + r) / (R - r) := by
-  rw [ div_eq_mul_inv ]
+  rw [div_eq_mul_inv]
   have h_cos : (R ^ 2 + r ^ 2 - 2 * R * r * Real.cos (θ - φ)) ≥ (R - r) ^ 2 := by
-    nlinarith [ mul_pos h₁ ( sub_pos.mpr h₂ ), Real.cos_le_one ( θ - φ ) ]
+    nlinarith [mul_pos h₁ (sub_pos.mpr h₂), Real.cos_le_one (θ - φ)]
   have h_subst : (R^2 - r^2) / (R^2 + r^2 - 2 * R * r * Real.cos (θ - φ)) ≤ (R + r) / (R - r) := by
-    rw [div_le_div_iff₀]
-    <;> nlinarith [mul_pos h₁ ( sub_pos.mpr h₂ )]
+    rw [div_le_div_iff₀] <;> nlinarith [mul_pos h₁ (sub_pos.mpr h₂)]
   convert h_subst using 1
   norm_num [Complex.normSq, Complex.exp_re, Complex.exp_im]
   ring_nf

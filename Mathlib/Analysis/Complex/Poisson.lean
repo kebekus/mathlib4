@@ -30,12 +30,18 @@ For convenience, this preliminary section discussed the kernels on integration t
 various versions of the Poisson Formula.
 -/
 
+/--
+The Herglotz-Riesz kernel of integration.
+-/
 noncomputable def HerglotzRiesz (c w : ℂ) : ℂ → ℂ :=
   fun z ↦ ((z - c) + (w - c)) / ((z - c) - (w - c))
 
 lemma herglotzRiesz_def (c w z : ℂ) :
     HerglotzRiesz c w z = ((z - c) + (w - c)) / ((z - c) - (w - c)) := by rfl
 
+/--
+The Poisson kernel of integration.
+-/
 noncomputable def Poisson (c w : ℂ) : ℂ → ℝ :=
   fun z ↦ (‖z - c‖ ^ 2 - ‖w - c‖ ^ 2) / ‖(z - c) - (w - c)‖ ^ 2
 

@@ -36,7 +36,7 @@ lemma re_herglotz_riesz_eq_poisson {a b : ℂ} :
     _ = (‖a‖ ^ 2 - ‖b‖ ^ 2) / ‖a - b‖ ^ 2 := by
       simp [← normSq_apply, normSq_eq_norm_sq]
 
-private lemma re_herglotz_riesz_le_aux {φ θ : ℝ} {r R : ℝ} (h₁ : 0 < r) (h₂ : r < R) :
+private lemma re_herglotz_riesz_le_aux (φ θ r R : ℝ) (h₁ : 0 < r) (h₂ : r < R) :
     ((R * exp (θ * I) + r * exp (φ * I)) / (R * exp (θ * I) - r * exp (φ * I))).re
       ≤ (R + r) / (R - r) := by
   rw [div_eq_mul_inv]
@@ -58,21 +58,12 @@ Herglotz-Riesz kernel.
 -/
 theorem re_herglotz_riesz_le {c z : ℂ} (hz : z ∈ sphere c R) (hw : w ∈ ball c R) :
     ((z - c + (w - c)) / ((z - c) - (w - c))).re ≤ (R + ‖w - c‖) / (R - ‖w - c‖) := by
-  have η₀ : 0 < R := by
-    by_contra h
-    grind [ball_eq_empty.2 (not_lt.1 h)]
-  have η₁ : R = ‖z - c‖ := by
-    simp_all
-  have η₂ : z - c ≠ 0 := by
-    aesop
+  obtain ⟨η₀, rfl, η₂⟩ : 0 < R ∧ R = ‖z - c‖ ∧ z - c ≠ 0 := by
+    grind [ball_eq_empty, mem_sphere, dist_eq_norm, norm_pos_iff]
   by_cases h₁w : ‖w - c‖ = 0
   · aesop
-  rw [← norm_mul_exp_arg_mul_I (z - c), η₁]
-  nth_rw 1 2 [← norm_mul_exp_arg_mul_I (w - c)]
-  apply re_herglotz_riesz_le_aux
-  · by_contra h
-    aesop
-  · rwa [mem_ball, dist_eq_norm, η₁] at hw
+  simpa using re_herglotz_riesz_le_aux (w - c).arg (z - c).arg ‖w - c‖ ‖z - c‖ (by simpa using h₁w)
+    (by simpa)
 
 private lemma le_re_herglotz_riesz_aux {φ θ : ℝ} {r R : ℝ} (h₁ : 0 < r) (h₂ : r < R) :
     (R - r) / (R + r)

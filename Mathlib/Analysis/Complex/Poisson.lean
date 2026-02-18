@@ -101,23 +101,14 @@ theorem le_re_herglotz_riesz {c z : ℂ} (hz : z ∈ sphere c R) (hw : w ∈ bal
 
 -- Trigonometric identity used in the computation of
 -- `DiffContOnCl.circleAverage_re_smul_on_ball_zero`.
-lemma circleAverage_re_smul_on_ball_zero_aux {φ θ : ℝ} {r : ℝ} (h₁ : 0 < r) (h₂ : r < R) :
+lemma circleAverage_re_smul_on_ball_zero_aux {φ θ : ℝ} {r : ℝ} :
     (R * exp (θ * I)) / (R * exp (θ * I)  - r * exp (φ * I)) - (r * exp (θ * I))
       / (r * exp (θ * I) - R * exp (φ * I))
       = ((R * exp (θ * I) + r * exp (φ * I)) / (R * exp (θ * I) - r * exp (φ * I))).re := by
-  have h₃ : (R * exp ( θ * I ) - r * exp (φ * Complex.I)) ≠ 0 := by
-    simpa [sub_eq_zero] using
-      (mt <| congr_arg (‖·‖)) <| by simpa [abs_of_pos, h₁, h₁.trans h₂] using h₂.ne'
-  simp_all only [Complex.ext_iff, sub_re, mul_re, ofReal_re, exp_ofReal_mul_I_re, ofReal_im,
-    exp_ofReal_mul_I_im, zero_mul, sub_zero, zero_re, sub_im, mul_im, add_zero, zero_im, not_and,
-    div_eq_mul_inv, add_re, inv_re, add_im, inv_im, neg_sub, ofReal_sub, ofReal_mul, ofReal_add,
-    ofReal_cos, ofReal_inv, ofReal_sin, cos_ofReal_im, mul_zero, normSq_ofReal, mul_inv_rev,
-    isUnit_iff_ne_zero, ne_eq, map_eq_zero, not_false_eq_true, implies_true,
-    IsUnit.mul_inv_cancel_left, sub_self, neg_zero, sin_ofReal_im]
-  norm_num [normSq, exp_re, exp_im]
+  simp only [Complex.ext_iff, exp_ofReal_mul_I, add_re, sub_re, mul_re, div_re, ofReal_re,
+      I_re, I_im, add_im, sub_im, mul_im, div_im, ofReal_im, normSq_apply]
   ring_nf
-  norm_cast
-  norm_num [Real.sin_sq, Real.cos_sq]
+  simp_rw [Real.sin_sq]
   ring_nf
   tauto
 
@@ -173,8 +164,8 @@ private lemma DiffContOnCl.circleAverage_re_smul_on_ball_zero [CompleteSpace E]
       have h₁φ : R * exp (z.arg * I) = z := by
         convert norm_mul_exp_arg_mul_I z
         simp_all [abs_of_pos]
-      rw [← norm_mul_exp_arg_mul_I w, ← h₁φ, ← circleAverage_re_smul_on_ball_zero_aux
-        (norm_pos_iff.mpr h₁w) (mem_ball_zero_iff.mp hw), norm_mul_exp_arg_mul_I w]
+      rw [← norm_mul_exp_arg_mul_I w, ← h₁φ, ← circleAverage_re_smul_on_ball_zero_aux,
+        norm_mul_exp_arg_mul_I w]
       congr 1
       ring_nf
       field [hR.ne.symm]

@@ -45,11 +45,12 @@ private lemma re_herglotz_riesz_le_aux (φ θ r R : ℝ) (h₁ : 0 < r) (h₂ : 
   have h_subst : (R^2 - r^2) / (R^2 + r^2 - 2 * R * r * Real.cos (θ - φ)) ≤ (R + r) / (R - r) := by
     rw [div_le_div_iff₀] <;> nlinarith [mul_pos h₁ (sub_pos.mpr h₂)]
   convert h_subst using 1
-  norm_num [Complex.normSq, Complex.exp_re, Complex.exp_im]
-  ring_nf
-  norm_num [Real.sin_sq, Real.cos_sq]
-  ring_nf
-  rw [Real.cos_sub]
+  rw [← div_eq_mul_inv, re_herglotz_riesz_eq_poisson]
+  suffices (R * R * normSq (cexp (θ * I)) + r * r * normSq (cexp (φ * I)) -
+      2 * (R * Real.cos θ * (r * Real.cos φ) + R * Real.sin θ * (r * Real.sin φ))) =
+      (R ^ 2 + r ^ 2 - 2 * R * r * Real.cos (θ - φ)) by
+    rw [← this]; simp [← normSq_eq_norm_sq, Complex.normSq_sub]
+  simp [normSq_eq_norm_sq, Real.cos_sub]
   ring
 
 /--
@@ -68,28 +69,22 @@ theorem re_herglotz_riesz_le {c z : ℂ} (hz : z ∈ sphere c R) (hw : w ∈ bal
 private lemma le_re_herglotz_riesz_aux (θ φ r R : ℝ) (h₁ : 0 < r) (h₂ : r < R) :
     (R - r) / (R + r)
       ≤ ((R * exp (θ * I) + r * exp (φ * I)) / (R * exp (θ * I) - r * exp (φ * I))).re := by
-  norm_num [ Complex.normSq, Complex.div_re ]
-  rw [ ← add_div, div_le_div_iff₀ ]
-  · ring_nf
-    norm_num [ Real.sin_sq, Real.cos_sq ]
-    ring_nf
-    nlinarith [ mul_le_mul_of_nonneg_left
-      (show Real.cos θ * Real.cos φ + Real.sin θ * Real.sin φ ≤ 1 by
-        nlinarith [sq_nonneg ( Real.cos θ * Real.sin φ - Real.sin θ * Real.cos φ ),
-          Real.sin_sq_add_cos_sq θ, Real.sin_sq_add_cos_sq φ ] )
-      (show 0 ≤ R * r by nlinarith), mul_le_mul_of_nonneg_left
-        (show Real.cos θ * Real.cos φ + Real.sin θ * Real.sin φ ≥ -1 by
-          nlinarith only [sq_nonneg ( Real.cos θ * Real.sin φ - Real.sin θ * Real.cos φ ),
-            Real.sin_sq_add_cos_sq θ, Real.sin_sq_add_cos_sq φ ] )
-        (show 0 ≤ R * r by nlinarith) ]
-  · linarith
-  · -- Expanding the squares and simplifying, we get:
-    have h_expand : (R * Real.cos θ - r * Real.cos φ) * (R * Real.cos θ - r * Real.cos φ)
-      + (R * Real.sin θ - r * Real.sin φ) * (R * Real.sin θ - r * Real.sin φ)
-      = R^2 + r^2 - 2 * R * r * Real.cos (θ - φ) := by
-      rw [ Real.cos_sub ]
-      nlinarith [ Real.sin_sq_add_cos_sq θ, Real.sin_sq_add_cos_sq φ ]
-    nlinarith [ mul_pos h₁ ( sub_pos.mpr h₂ ), Real.cos_le_one ( θ - φ ) ]
+  rw [re_herglotz_riesz_eq_poisson]
+  simp only [Complex.norm_mul, norm_real, norm_eq_abs, norm_exp_ofReal_mul_I, mul_one, sq_abs,
+    sq_sub_sq]
+  field_simp [sub_pos.mpr h₂]
+  simp only [mul_comm I] -- make sure exponents are in the form `?angle * I` for the simplification
+  rw [div_le_div_iff₀ (by positivity [h₁.trans h₂]) ?hpos, ← normSq_eq_norm_sq, normSq_sub,
+    normSq_eq_norm_sq, normSq_eq_norm_sq]
+  case hpos => simpa [sq_pos_iff, sub_eq_zero] using
+    (mt <| congr_arg (‖·‖)) <| by simpa [abs_of_pos, h₁, h₁.trans h₂] using h₂.ne'
+  have key := calc
+    (-(R * cexp (θ * I) * (starRingEnd ℂ) (r * cexp (φ * I)))).re ≤ _ := re_le_norm _
+    _ ≤ R * r := by simp [abs_of_pos, h₁, h₁.trans h₂]
+  simpa using calc
+    R ^ 2 + r ^ 2 - 2 * (R * cexp (θ * I) * (starRingEnd ℂ) (r * cexp (φ * I))).re
+    _ ≤ R ^ 2 + r ^ 2 + 2 * (R * r) := by rw [sub_eq_add_neg, ← mul_neg, ← neg_re]; gcongr
+    _ = (R + r) * (R + r) := by ring
 
 /--
 Companion theorem to the Poisson Integral Formula: Lower estimate for the real part of the

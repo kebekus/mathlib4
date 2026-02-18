@@ -32,7 +32,7 @@ lemma re_herglotz_riesz_eq_poisson {a b : ℂ} :
   rw [div_re, normSq_eq_norm_sq (a - b), ← add_div, add_re, sub_re, add_im, sub_im]
   calc ((a.re + b.re) * (a.re - b.re) + (a.im + b.im) * (a.im - b.im)) / ‖a - b‖ ^ 2
     _ = ((a.re * a.re + a.im * a.im) - (b.re * b.re + b.im * b.im)) / ‖a - b‖ ^ 2 := by
-      ring_nf
+      congr! 1; ring
     _ = ((normSq a) - (normSq b)) / ‖a - b‖ ^ 2 := by
       simp only [normSq_apply]
     _ = (‖a‖ ^ 2 - ‖b‖ ^ 2) / ‖a - b‖ ^ 2 := by

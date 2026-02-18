@@ -300,12 +300,6 @@ lemma single_nonneg [DecidableEq X] [Zero Y] [Preorder Y] {x : X} {y : Y} :
   simp only [le_def, coe_single]
   apply Pi.single_nonneg
 
-@[simp] lemma single_nonneg_nat_one [DecidableEq X] [Zero Y] [Preorder Y] {x : X} :
-    0 ≤ single x 1 := single_nonneg.2 (Nat.zero_le 1)
-
-@[simp] lemma single_nonneg_int_one [DecidableEq X] [Zero Y] [Preorder Y] {x : X} :
-    0 ≤ single x (1 : ℤ) := single_nonneg.2 Int.one_nonneg
-
 instance [Preorder Y] [Zero Y] : LT (locallyFinsuppWithin U Y) where
   lt := fun D₁ D₂ ↦ (D₁ : X → Y) < D₂
 
@@ -317,10 +311,10 @@ lemma single_pos [DecidableEq X] [Zero Y] [Preorder Y] {x : X} {y : Y} :
   simp only [lt_def, coe_single, Pi.single]
   exact lt_update_self_iff
 
-@[simp] lemma single_pos_nat_one [DecidableEq X] [Zero Y] [Preorder Y] {x : X} :
+@[simp] lemma single_pos_nat_one [DecidableEq X] {x : X} :
     0 < single x 1 := single_pos.2 Nat.one_pos
 
-@[simp] lemma single_pos_int_one [DecidableEq X] [Zero Y] [Preorder Y] {x : X} :
+@[simp] lemma single_pos_int_one [DecidableEq X] {x : X} :
     0 < single x (1 : ℤ) := single_pos.2 Int.one_pos
 
 instance [SemilatticeSup Y] [Zero Y] : Max (locallyFinsuppWithin U Y) where

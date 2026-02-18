@@ -289,7 +289,7 @@ formulated with the Poisson kernel of integration.
 -/
 theorem DiffContOnCl.circleAverage_poisson_smul [CompleteSpace E] {c : ℂ}
     (hf : DiffContOnCl ℂ f (ball c R)) (hw : w ∈ ball c R) :
-    Real.circleAverage (fun z ↦ (Poisson c w z) • f z) c R
+    Real.circleAverage ((Poisson c w) • f) c R
       = f w := by
   simp_rw [poisson_eq_re_herglotz_riesz]
   apply hf.circleAverage_re_herglotzRiesz_smul hw

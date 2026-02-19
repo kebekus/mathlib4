@@ -308,8 +308,8 @@ lemma lt_def [Preorder Y] [Zero Y] {D₁ D₂ : locallyFinsuppWithin U Y} :
 
 lemma single_pos [DecidableEq X] [Zero Y] [Preorder Y] {x : X} {y : Y} :
     0 < single x y ↔ 0 < y := by
-  simp only [lt_def, coe_single, Pi.single]
-  exact lt_update_self_iff
+  rw [lt_def, coe_single]
+  exact Pi.single_pos
 
 @[simp] lemma single_pos_nat_one [DecidableEq X] {x : X} :
     0 < single x 1 := single_pos.2 Nat.one_pos

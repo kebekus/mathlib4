@@ -10,10 +10,9 @@ public import Mathlib.Analysis.InnerProductSpace.Harmonic.Basic
 /-!
 # Functions Harmonic on a Domain and Continuous on Its Closure
 
-Many theorems in harmonic analysis assume that a function is complex harmonic on
-a domain and is continuous on its closure. In this file we define a predicate
-`HarmonicContOnCl` that expresses this property and prove basic facts about this
-predicate.
+Many theorems in harmonic analysis assume that a function is harmonic on a domain and is continuous
+on its closure. In this file we define a predicate `HarmonicContOnCl` that expresses this property
+and prove basic facts about this predicate.
 -/
 
 @[expose] public section
@@ -29,8 +28,8 @@ open Laplacian Metric Topology
 namespace InnerProductSpace
 
 /--
-A predicate saying that a function is harmonic on a set and is continuous on its
-closure. This is a common assumption in harmonic analysis.
+A predicate saying that a function is harmonic on a set and is continuous on its closure. This is a
+common assumption in harmonic analysis.
 -/
 @[fun_prop] structure HarmonicContOnCl (f : E → F) (s : Set E) : Prop where
   protected harmonicOnNhd : HarmonicOnNhd f s
